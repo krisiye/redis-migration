@@ -12,8 +12,8 @@ import java.io.File;
 @Parameters(separators = "=")
 public class Options {
 
-    @Parameter(names = "--configFile", converter = FileConverter.class, required = true)
-    private File configFile;
+    @Parameter(names = "--configFile", converter = FileConverter.class)
+    private File configFile = new File("conf/redis-migration.properties");
 
     @Parameter(names = "--help", help = true)
     private boolean help;
