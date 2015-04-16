@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 BeyondPN
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.beyondpn.redis.migration.command;
 
 import com.beust.jcommander.Parameters;
@@ -49,7 +65,7 @@ public class CommandMigrate extends Command {
                 for (File script : scripts) {
                     String name = script.getName();
                     int version = Integer.parseInt(name.substring(1, name.indexOf(SEPARATOR)));
-                    long hash = this.caclHash(script);
+                    long hash = this.calcHash(script);
                     if (metaList.size() >= version) {
                         //check file hash
                         VersionMeta meta = metaList.get(version - 1);
@@ -83,7 +99,7 @@ public class CommandMigrate extends Command {
 
     }
 
-    private long caclHash(File script) {
+    private long calcHash(File script) {
         try {
             FileChannel fileChannel = new RandomAccessFile(script, "r").getChannel();
             if (fileChannel.size() > Integer.MAX_VALUE) {
