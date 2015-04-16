@@ -8,6 +8,9 @@ redis version of flyway
 启动脚本修改自 flyway 启动脚本
 
 ### 使用示例
+
+```shell
 redis-migration clean
 redis-migration migrate
 redis-migration info
+```
