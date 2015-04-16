@@ -1,0 +1,3 @@
+//SCRIPT SHOULD BE NAMED LIKE V1__SCRIPT_DESC.groovy V2__SCRIPT_DESC.groovy
+//use jedis as the redis client
+jedis.setnx("test","this is a test")
