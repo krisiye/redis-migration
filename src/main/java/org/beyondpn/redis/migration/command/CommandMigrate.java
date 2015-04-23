@@ -21,8 +21,11 @@ import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
+import org.beyondpn.redis.migration.log.Logger;
+import org.beyondpn.redis.migration.log.LoggerFactory;
 import org.beyondpn.redis.migration.meta.MetaService;
 import org.beyondpn.redis.migration.meta.VersionMeta;
+import org.beyondpn.redis.migration.util.StopWatch;
 import redis.clients.jedis.Jedis;
 
 import java.io.File;
@@ -36,10 +39,14 @@ import java.util.List;
 import java.util.zip.CRC32;
 
 /**
+ * <strong>migrate</strong> command, would migrate redis db to latest version.
+ * <p>
  * Created by yangjianhua on 2015/4/13.
  */
-@Parameters(commandNames = "migrate", separators = "=", commandDescription = "clean all keys from redis")
+@Parameters(commandNames = "migrate", separators = "=", commandDescription = "execute migrate scripts")
 public class CommandMigrate extends Command {
+
+    private Logger logger = LoggerFactory.getLogger(CommandMigrate.class);
 
     private static final String PREFIX = "V";
     private static final String SEPARATOR = "__";
@@ -62,6 +69,9 @@ public class CommandMigrate extends Command {
                 MetaService metaService = new MetaService(jedis);
                 List<VersionMeta> metaList = metaService.selectVersionMeta();
 
+                int migrateCount = 0;
+                StopWatch totalStopWatch = new StopWatch();
+                totalStopWatch.start();
                 for (File script : scripts) {
                     String name = script.getName();
                     int version = Integer.parseInt(name.substring(1, name.indexOf(SEPARATOR)));
@@ -85,16 +95,27 @@ public class CommandMigrate extends Command {
                     versionMeta.setHash(hash);
                     metaService.setVersionMeta(versionMeta);
 
+                    StopWatch stopWatch = new StopWatch();
+                    stopWatch.start();
                     groovyScriptEngine.run(name, binding);
+                    logger.info("Successfully completed migration of  to version " + version);
+                    migrateCount++;
 
-                    versionMeta.setExecuteMills((int) (System.currentTimeMillis() - versionMeta.getExecuteOn().getTime()));
+                    versionMeta.setExecuteMills((int) (stopWatch.getMills()));
                     versionMeta.setSuccess(1);
                     metaService.setVersionMeta(versionMeta);
                 }
+
+                totalStopWatch.stop();
+                if(migrateCount == 0){
+                    logger.info("Redis is up to date. No migration necessary.");
+                }else{
+                    logger.info("Successfully applied " + migrateCount + " migrations to Redis (execution time : " + totalStopWatch.getMills() + " ms).");
+                }
+
             } catch (IOException | ResourceException | ScriptException e) {
                 throw new RuntimeException(e);
             }
-
         }
 
     }

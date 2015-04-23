@@ -17,15 +17,32 @@
 package org.beyondpn.redis.migration.command;
 
 import com.beust.jcommander.Parameters;
+import org.beyondpn.redis.migration.log.Logger;
+import org.beyondpn.redis.migration.log.LoggerFactory;
+import org.beyondpn.redis.migration.util.StopWatch;
 import redis.clients.jedis.Jedis;
 
 /**
+ * <strong>clean</strong> command. Would flush redis db.
+ * <p>
  * Created by yangjianhua on 2015/4/13.
  */
 @Parameters(commandNames = "clean", separators = "=", commandDescription = "clean all keys from redis")
 public class CommandClean extends Command {
+
+    private Logger logger = LoggerFactory.getLogger(CommandClean.class);
+
     @Override
     public void doExecute(Jedis jedis) {
-        jedis.flushDB();
+        boolean cleanEnable = "true".equals(super.getProperty("command.clean.enable"));
+        if (cleanEnable) {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            jedis.flushDB();
+            stopWatch.stop();
+            logger.info(String.format("redis db flushed (execute time : %d ms)", stopWatch.getMills()));
+        } else {
+            logger.info("clean command is disabled. nothing changed.");
+        }
     }
 }

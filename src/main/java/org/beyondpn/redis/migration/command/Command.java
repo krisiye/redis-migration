@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
+ * Base class of command.
+ * <p>
  * Created by yangjianhua on 2015/4/13.
  */
 public abstract class Command {
@@ -33,6 +35,11 @@ public abstract class Command {
     private String redisHost;
     private int redisPort;
 
+    /**
+     * set command options
+     *
+     * @param options options
+     */
     public void setOptions(Options options) {
         File file = options.getConfigFile();
         properties = new Properties();
@@ -45,10 +52,19 @@ public abstract class Command {
         redisPort = Integer.parseInt(getProperty("redis.port"));
     }
 
+    /**
+     * get config property.
+     *
+     * @param key property key
+     * @return property value
+     */
     protected String getProperty(String key) {
         return properties.getProperty(key);
     }
 
+    /**
+     * execute command.
+     */
     public void execute() {
         Jedis jedis = new Jedis(redisHost, redisPort);
         try {
@@ -58,6 +74,11 @@ public abstract class Command {
         }
     }
 
+    /**
+     * command logic.
+     *
+     * @param jedis connection of th configured redis.
+     */
     protected abstract void doExecute(Jedis jedis);
 
 }
