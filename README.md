@@ -17,4 +17,8 @@ redis-migration info
 
 ### Requirements
 
-Jre 1.8+
+jre 1.8+
+
+### Downloads
+
+https://pan.baidu.com/s/1o69QhZW#path=%252Fredis-migration
