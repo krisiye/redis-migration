@@ -29,7 +29,7 @@ import java.io.File;
 public class Options {
 
     @Parameter(names = "--configFile", converter = FileConverter.class)
-    private File configFile = new File("conf/redis-migration.properties");
+    private File configFile = new File(getClass().getClassLoader().getResource("conf/redis-migration.properties").getFile());
 
     @Parameter(names = "--help", help = true)
     private boolean help;
